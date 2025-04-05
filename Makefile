@@ -29,3 +29,11 @@ bandit:
 # Run unit tests using pytest
 test:
 	pytest $(TEST_DIR)
+
+# Build a Dockerfile
+docker-build:
+	docker build -- devops_proj .
+
+# Run a docker image
+docker-compose:
+	docker compose up --detach
