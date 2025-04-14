@@ -13,15 +13,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install black bandit
-      - run: pip install -r requirements.txt
-      - run: make black_check
-      - run: make bandit
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip 
+          pip install black bandit -r requirements.txt
+
+      - name: Check black on all files
+        run: make black_check
+
+      - name: Check security in the project
+        run: make bandit
 
   test:
     name: Run some tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
       - run: pip install -r requirements.txt
       - run: make test
