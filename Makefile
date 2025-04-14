@@ -24,7 +24,7 @@ lint_test:
 
 # Perform security analysis on the project directory using Bandit
 bandit:
-	bandit $(PROJECT_DIR)
+	bandit -r $(PROJECT_DIR)
 
 # Run unit tests using pytest
 test:
