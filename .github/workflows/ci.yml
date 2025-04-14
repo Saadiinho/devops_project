@@ -8,6 +8,15 @@ on:
       - feature/**
 
 jobs:
+  format:
+    name: Black and Bandit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install black bandit
+      - run: pip install -r requirements.txt
+      - run: black --check devops_project/.
+
   test:
     name: Run some tests
     runs-on: ubuntu-latest

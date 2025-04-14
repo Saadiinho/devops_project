@@ -1,6 +1,6 @@
 # Define directories for the project and tests
 TEST_DIR = 'tests/'               # Directory containing test files
-PROJECT_DIR = 'devops_project/'   # Directory containing the main project code
+PROJECT_DIR = 'devops_project/.'   # Directory containing the main project code
 
 # Format the code in the project directory using Black
 black:
