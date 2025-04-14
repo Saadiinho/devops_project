@@ -1,0 +1,17 @@
+name: FastAPI, Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+
+jobs:
+  test:
+    name: Run some tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pytest
+      - run: make test
