@@ -15,7 +15,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: pip install black bandit
       - run: pip install -r requirements.txt
-      - run: black --check devops_project/.
+      - run: make black_check
+      - run: make bandit
 
   test:
     name: Run some tests
