@@ -32,7 +32,7 @@ test:
 
 # Build a Dockerfile
 docker-build:
-	docker build -- devops_proj .
+	docker build -t devops_proj:latest .
 
 # Run a docker image
 docker-compose:
