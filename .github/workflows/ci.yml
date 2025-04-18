@@ -50,27 +50,36 @@ jobs:
         run: make test
 
   qualimetry:
-    name: View quality of code with sonarqube
+    name: View quality of code with SonarQube
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          java-version: '17'
-          distribution: ''
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests and generate coverage report
+        run: |
+          pip install pytest-cov
+          pytest --cov=./ --cov-report=xml
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@v1
         with:
           args: >
             -Dsonar.projectKey=devops_project
-            -Dsonar.host.url=http://0.0.0.0:9000/
-        env:
-          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+            -Dsonar.sources=.
+            -Dsonar.host.url=${{ secrets.SONARQUBE_URL }}
+            -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }}
+            -Dsonar.python.coverage.reportPaths=coverage.xml
 
 
   build:
