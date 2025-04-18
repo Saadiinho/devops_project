@@ -80,6 +80,9 @@ jobs:
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.python.coverage.reportPaths=coverage.xml
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONARQUBE_URL }}
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
 
 
   build:
