@@ -34,6 +34,16 @@ test:
 docker-build:
 	docker build -t devops_proj:latest .
 
+# Build a Dockerfile in dev environment
+docker-dev:
+	ENV=dev docker build -t devops_proj:latest .
+
+# Build a Dockerfile in prod environment
+docker-prod:
+	ENV=prod docker build -t devops_proj:latest .
+
 # Run a docker image
 docker-compose:
 	docker compose up --detach
+
+# TODO Rajouter une commande ou modifier la précédente pour lui fournir le fichier d'environnement
