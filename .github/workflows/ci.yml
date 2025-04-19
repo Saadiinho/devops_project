@@ -62,27 +62,19 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 
-  build:
-    name: Build Dockerfile
+
+
+  build_publish:
+    name: Publish image
     runs-on: ubuntu-latest
-    env:
-      ENV: dev
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
         run: docker build -t ghcr.io/${{ secrets.GHCR_USERNAME_LOWER }}/devops_project:latest .
-
-
-  publish:
-    name: Publish image
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Log in to Github Container Registry
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
