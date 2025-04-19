@@ -2,10 +2,8 @@ services:
   app:
     image: devops_proj
     container_name: fastapi-app
-    env_file:
-      - .env.${ENV}
     ports:
-      - "${APP_PORT}:${APP_PORT}"
+      - "4000:80"
     volumes:
       - .:/app
     restart: always
