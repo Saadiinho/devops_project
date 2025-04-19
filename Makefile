@@ -1,49 +1,51 @@
-# Define directories for the project and tests
-TEST_DIR = 'tests/'               # Directory containing test files
-PROJECT_DIR = 'devops_project/.'   # Directory containing the main project code
+# ==================================================================================== #
+# VARIABLES
+# ==================================================================================== #
+TEST_DIR := tests/
+DEVOPS_PROJECT := devops_project/
 
-# Format the code in the project directory using Black
-black:
-	black $(PROJECT_DIR)
 
-# Format the code in the test directory using Black
-black_test:
-	black $(TEST_DIR)
+# ==================================================================================== #
+# HELPERS
+# ==================================================================================== #
+## help: print this help message
+.PHONY: help
+help:
+	@echo 'Usage:'
+	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ":" | sed -e 's/^/ /'
 
-# Check if the code in the project directory conforms to Black formatting (without modifying files)
-black_check:
-	black --check $(PROJECT_DIR)
 
-# Lint the code in the project directory using Pylint
-lint:
-	pylint $(PROJECT_DIR)
+# ==================================================================================== #
+# BUILD
+# ==================================================================================== #
 
-# Lint the code in the test directory using Pylint
-lint_test:
-	pylint $(TEST_DIR)
-
-# Perform security analysis on the project directory using Bandit
-bandit:
-	bandit -r $(PROJECT_DIR)
-
-# Run unit tests using pytest
+## test: run pytest on the tests directory
 test:
 	pytest $(TEST_DIR)
 
-# Build a Dockerfile
-docker-build:
-	docker build -t devops_proj:latest .
+## test: run coverage on the tests directory
+cov:
+	coverage run -m pytest --cov=. --cov-report xml $(TEST_DIR)/*
 
-# Build a Dockerfile in dev environment
-docker-dev:
-	ENV=dev docker build -t devops_proj:latest .
+## black: run black on the current directory
+black:
+	black .
 
-# Build a Dockerfile in prod environment
-docker-prod:
-	ENV=prod docker build -t devops_proj:latest .
+## black_check: Verify code formatting with black.
+black_check:
+	black --check .
 
-# Run a docker image
-docker-compose:
-	docker compose up --detach
+## black_test: run black on the tests directory
+black_test:
+	black $(TEST_DIR)
 
-# TODO Rajouter une commande ou modifier la précédente pour lui fournir le fichier d'environnement
+## black_festo: run black on the project directory
+black_devops:
+	black $(DEVOPS_PROJECT)
+
+## bandit: run bandit on the project directory
+bandit:
+	bandit -r $(DEVOPS_PROJECT)/*.py
+
+## all: run all tests, linting, and formatting
+all: test cov black black_check black_test black_devops bandit
