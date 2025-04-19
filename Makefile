@@ -47,5 +47,9 @@ black_devops:
 bandit:
 	bandit -r $(DEVOPS_PROJECT)/*.py
 
+## docker-build: Build image of the project
+docker-build:
+	docker build -t devops_project:latest .
+
 ## all: run all tests, linting, and formatting
 all: test cov black black_check black_test black_devops bandit
