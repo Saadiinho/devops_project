@@ -18,13 +18,13 @@ jobs:
         uses: hasicorp/setup-terraform@v3
 
       - name: Init Terraform
-        uses: terraform init
+        run: terraform init
 
       - name: Plan Terraform
-        uses: terraform plan
+        run: terraform plan
 
       - name: Apply Terraform
-        uses: terraform apply
+        run: terraform apply
         env: 
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
