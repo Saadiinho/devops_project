@@ -3,25 +3,25 @@ provider "aws" {
 }
 
 resource "aws_key_pair" "default" {
-  key_name = var.key_name
+  key_name   = var.key_name
   public_key = var.key_public
 }
 
 resource "aws_security_group" "ssh_http" {
-  name = "ssh_http"
+  name        = "ssh_http"
   description = "Allow ports 22 and 80"
 
   ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = [var.my_ip_address]
   }
 
   ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -34,9 +34,9 @@ resource "aws_security_group" "ssh_http" {
 }
 
 resource "aws_instance" "ec2_instance" {
-  ami                         = "ami-0ff71843f814379b3" 
-  instance_type               = var.instance_type
-  key_name = aws_key_pair.default.key_name
+  ami                    = "ami-0ff71843f814379b3"
+  instance_type          = var.instance_type
+  key_name               = aws_key_pair.default.key_name
   vpc_security_group_ids = [aws_security_group.ssh_http.id]
 
   tags = {
