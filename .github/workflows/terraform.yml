@@ -2,7 +2,7 @@ name: Add instance with terraform
 
 on:
   push:
-    branch: 
+    branches: 
       - main
 
 jobs:
