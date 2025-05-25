@@ -1,9 +1,7 @@
 services:
   app:
-    image: devops_project
+    image: ghcr.io/saadiinho/devops_project 
     container_name: fastapi-app
     ports:
       - "4000:80"
-    volumes:
-      - .:/app
     restart: always

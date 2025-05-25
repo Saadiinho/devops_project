@@ -73,7 +73,7 @@ docker-build:
 ## docker-build: Build image of the project
 .PHONY: stop
 stop:
-	docker compose down
+	docker compose -f docker/docker-compose.yml down
 
 # ==================================================================================== #
 # RUN
@@ -81,5 +81,5 @@ stop:
 
 ## docker-build: Build image of the project
 .PHONY: run
-run:stop docker-build 
-	docker compose up -d
+run:stop
+	docker compose -f docker/docker-compose.yml up -d
