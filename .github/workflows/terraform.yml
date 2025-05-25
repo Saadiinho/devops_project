@@ -1,7 +1,10 @@
 name: Terraform Destroy
 
 on:
-  - feature/*
+  push:
+    branch: 
+      - main
+      - feature/*
 
 jobs:
   destroy:
