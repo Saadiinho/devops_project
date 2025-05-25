@@ -1,2 +1,8 @@
 .venv/
 .env*
+terraform/aws/
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/awscliv2.zip
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
