@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_key_pair" "default" {
   key_name = var.key_name
-  public_key = file(var.key_public)
+  public_key = var.key_public
 }
 
 resource "aws_security_group" "ssh_http" {
