@@ -12,7 +12,6 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Publish image
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/head/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
