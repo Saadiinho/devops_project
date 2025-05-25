@@ -35,7 +35,7 @@ resource "aws_security_group" "ssh_http" {
 
 resource "aws_instance" "ec2_instance" {
   ami                         = "ami-0ff71843f814379b3" 
-  instance_type               = "t3.micro"
+  instance_type               = var.instance_type
   key_name = aws_key_pair.default.key_name
   vpc_security_group_ids = [aws_security_group.ssh_http.id]
 
