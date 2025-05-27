@@ -64,7 +64,7 @@ bandit:
 ## docker-build: Build image of the project
 .PHONY: docker-build
 docker-build:
-	docker build -t devops_project .
+	docker build -f docker/Dockerfile -t ghcr.io/saadiinho/devops_project  .
 
 # ==================================================================================== #
 # STOP
@@ -73,7 +73,7 @@ docker-build:
 ## docker-build: Build image of the project
 .PHONY: stop
 stop:
-	docker compose -f docker/docker-compose.yml down
+	docker compose --env-file .env -f docker/docker-compose.yml down
 
 # ==================================================================================== #
 # RUN
@@ -82,4 +82,4 @@ stop:
 ## docker-build: Build image of the project
 .PHONY: run
 run:stop
-	docker compose -f docker/docker-compose.yml up -d
+	docker compose --env-file .env -f docker/docker-compose.yml up -d
