@@ -1,10 +1,9 @@
 from fastapi import FastAPI
+import os
 
 app = FastAPI()
 
 __version__ = "1.0.0"
-
-
 
 
 # Lire les variables d'environnement
