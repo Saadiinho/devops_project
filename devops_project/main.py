@@ -8,17 +8,16 @@ app = FastAPI()
 __version__ = "1.0.0"
 
 
-# Lire les variables d'environnement
 MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
-MYSQL_HOST = os.getenv("MYSQL_HOST", "mysql")  # Host = nom du service docker mysql
+MYSQL_HOST = os.getenv("MYSQL_HOST", "mysql")
 MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 MYSQL_PORT = os.getenv("MYSQL_PORT", "3306")
 
 DATABASE_URL = f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
 
-def test_db_connection() -> str:
+def db_connection():
     try:
         connection = mysql.connector.connect(
             host=MYSQL_HOST,
@@ -27,18 +26,42 @@ def test_db_connection() -> str:
             database=MYSQL_DATABASE,
         )
         if connection.is_connected():
-            return "Successful connexion"
+            return connection, "Successful connection"
     except Error as e:
-        return "Unsuccessful connection"
-    finally:
-        if "connection" in locals() and connection.is_connected():
-            connection.close()
+        return None, f"Unsuccessful connection: {str(e)}"
+
+
+def test_db_connection() -> str:
+    _, message = db_connection()
+    return message
 
 
 @app.get("/healthcheck")
-def root():
+def healthcheck():
     return {
         "name": "devops_project API",
         "version": __version__,
         "status": {"application": "running", "database": test_db_connection()},
     }
+
+
+@app.get("/domain_skills")
+def domain_skills():
+    connection, message = db_connection()
+    if not connection:
+        return {"error": message}
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT id, name FROM domain_skills")
+        results = cursor.fetchall()
+        return {"domain_skills": results}
+
+    except Error as e:
+        return {"error": f"Query failed: {str(e)}"}
+
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if connection.is_connected():
+            connection.close()

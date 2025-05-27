@@ -5,11 +5,19 @@ from devops_project.main import __version__
 client = TestClient(app)
 
 
-def test_read_root():
+def test_read_healthcheck():
     response = client.get("/healthcheck")
     assert response.status_code == 200
     assert response.json() == {
         "name": "devops_project API",
         "version": __version__,
-        "status": {"application": "running", "database": "Unsuccessful connection"},
+        "status": {
+            "application": "running",
+            "database": "Unsuccessful connection: 2005 (HY000): Unknown MySQL server host 'mysql' (-3)",
+        },
     }
+
+
+def test_domain_skills():
+    response = client.get("domain_skills")
+    assert response.status_code == 200
