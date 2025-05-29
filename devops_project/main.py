@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from typing import Optional
+from fastapi import FastAPI, Query
 import os
 import mysql.connector
 from mysql.connector import Error
@@ -95,8 +96,11 @@ def skills():
         if connection.is_connected():
             connection.close()
 
+
 @app.get("/projects")
-def get_projects(domain: Optional[str] = Query(None), skill: Optional[int] = Query(None)):
+def get_projects(
+    domain: Optional[str] = Query(None), skill: Optional[int] = Query(None)
+):
     connection, message = db_connection()
     if not connection:
         return {"error": message}
@@ -113,11 +117,13 @@ def get_projects(domain: Optional[str] = Query(None), skill: Optional[int] = Que
             params["domain"] = domain
 
         if skill:
-            conditions.append("""
+            conditions.append(
+                """
                 project_id IN (
                     SELECT project_id FROM project_skills WHERE skill_id = %(skill)s
                 )
-            """)
+            """
+            )
             params["skill"] = skill
 
         if conditions:
@@ -151,6 +157,7 @@ def get_projects(domain: Optional[str] = Query(None), skill: Optional[int] = Que
             cursor.close()
         if connection.is_connected():
             connection.close()
+
 
 @app.get("/domain-skills")
 def domain_skills():
