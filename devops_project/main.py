@@ -184,6 +184,7 @@ def get_project(project_id: int):
         if connection.is_connected():
             connection.close()
 
+
 @app.get("/educations")
 def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
     """
@@ -200,7 +201,7 @@ def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
         if education is not None:
             cursor.execute(
                 "SELECT * FROM education WHERE education = %s ORDER BY education_id DESC",
-                (education,)
+                (education,),
             )
         else:
             cursor.execute("SELECT * FROM education ORDER BY education_id DESC")
@@ -216,6 +217,7 @@ def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
             cursor.close()
         if connection.is_connected():
             connection.close()
+
 
 @app.get("/domain-skills")
 def domain_skills():
