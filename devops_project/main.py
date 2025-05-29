@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 import os
 import mysql.connector
 from mysql.connector import Error
@@ -69,7 +69,7 @@ def education_name_logo():
             connection.close()
 
 
-@app.get("skills")
+@app.get("/skills")
 def skills():
     connection, message = db_connection()
     if not connection:
@@ -158,6 +158,64 @@ def get_projects(
         if connection.is_connected():
             connection.close()
 
+
+@app.get("/project/{project_id}")
+def get_project(project_id: int):
+    connection, message = db_connection()
+    if not connection:
+        raise HTTPException(status_code=500, detail=message)
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM project WHERE project_id = %s", (project_id,))
+        project = cursor.fetchone()
+
+        if project:
+            return {"project": project}
+        else:
+            raise HTTPException(status_code=404, detail="Projet introuvable")
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")
+
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if connection.is_connected():
+            connection.close()
+
+@app.get("/educations")
+def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
+    """
+    Retourne les parcours scolaire (education=1) ou professionnels (education=0).
+    Si aucun filtre n'est passé, retourne tout.
+    """
+    connection, message = db_connection()
+    if not connection:
+        raise HTTPException(status_code=500, detail=message)
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+
+        if education is not None:
+            cursor.execute(
+                "SELECT * FROM education WHERE education = %s ORDER BY education_id DESC",
+                (education,)
+            )
+        else:
+            cursor.execute("SELECT * FROM education ORDER BY education_id DESC")
+
+        results = cursor.fetchall()
+        return {"educations": results}
+
+    except Error as e:
+        raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")
+
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if connection.is_connected():
+            connection.close()
 
 @app.get("/domain-skills")
 def domain_skills():

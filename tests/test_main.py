@@ -18,6 +18,7 @@ def test_read_healthcheck():
     }
 
 
-def test_domain_skills():
-    response = client.get("/domain-skills")
+def test_education_name_logo():
+    response = client.get("/education-name-logo")
     assert response.status_code == 200
+    
