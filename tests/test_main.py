@@ -19,5 +19,5 @@ def test_read_healthcheck():
 
 
 def test_domain_skills():
-    response = client.get("domain_skills")
+    response = client.get("/domain-skills")
     assert response.status_code == 200

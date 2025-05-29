@@ -68,7 +68,91 @@ def education_name_logo():
             connection.close()
 
 
-@app.get("/domain_skills")
+@app.get("skills")
+def skills():
+    connection, message = db_connection()
+    if not connection:
+        return {"error": message}
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(
+            """
+                SELECT ds.name AS domaine, s.name AS competence, s.icone, s.course
+                FROM domain_skills_links dsl
+                JOIN skills s ON dsl.skill_id = s.skills_id
+                JOIN domain_skills ds ON dsl.domain_id = ds.id
+            """
+        )
+        results = cursor.fetchall()
+        return {"education": results}
+    except Error as e:
+        return {"error": f"Query failed: {str(e)}"}
+
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if connection.is_connected():
+            connection.close()
+
+@app.get("/projects")
+def get_projects(domain: Optional[str] = Query(None), skill: Optional[int] = Query(None)):
+    connection, message = db_connection()
+    if not connection:
+        return {"error": message}
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+
+        query = "SELECT * FROM project"
+        conditions = []
+        params = {}
+
+        if domain:
+            conditions.append("domain = %(domain)s")
+            params["domain"] = domain
+
+        if skill:
+            conditions.append("""
+                project_id IN (
+                    SELECT project_id FROM project_skills WHERE skill_id = %(skill)s
+                )
+            """)
+            params["skill"] = skill
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        cursor.execute(query, params)
+        results = cursor.fetchall()
+
+        # Optionnel : trie comme en PHP
+        logiciel = []
+        web = []
+        autre = []
+
+        for proj in results:
+            if proj["domain"] == "Développement logiciel":
+                logiciel.append(proj)
+            elif proj["domain"] == "Développement web":
+                web.append(proj)
+            else:
+                autre.append(proj)
+
+        sorted_projects = logiciel + web + autre
+
+        return {"projects": sorted_projects}
+
+    except Error as e:
+        return {"error": f"Query failed: {str(e)}"}
+
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if connection.is_connected():
+            connection.close()
+
+@app.get("/domain-skills")
 def domain_skills():
     connection, message = db_connection()
     if not connection:
