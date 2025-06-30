@@ -51,6 +51,7 @@ class EducationNameLogo(BaseModel):
     name: str
     logo: str
 
+
 @app.get("/education-name-logo", response_model=List[EducationNameLogo])
 def education_name_logo():
     connection, message = db_connection()
@@ -78,6 +79,7 @@ class Skill(BaseModel):
     skill: str
     icone: str
     course: bool
+
 
 @app.get("/skills", response_model=Skill)
 def skills():
@@ -118,6 +120,7 @@ class Project(BaseModel):
     features: str
     isWebsite: bool
     demonstrate: bool
+
 
 @app.get("/projects", response_model=Project)
 def get_projects(
@@ -217,6 +220,7 @@ class Education(BaseModel):
     date: str
     education: str
 
+
 @app.get("/educations", response_model=Education)
 def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
     """
@@ -254,6 +258,7 @@ def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
 class DomainSkill(BaseModel):
     id: int
     name: str
+
 
 @app.get("/domain-skills", response_model=DomainSkill)
 def domain_skills():

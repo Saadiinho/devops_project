@@ -16,6 +16,3 @@ def test_read_healthcheck():
             "database": "Unsuccessful connection: 2005 (HY000): Unknown MySQL server host 'mysql' (-3)",
         },
     }
-
-
-
