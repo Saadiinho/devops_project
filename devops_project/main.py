@@ -194,7 +194,7 @@ def get_project(project_id: int):
         project = cursor.fetchone()
 
         if project:
-            return {"project": project}
+            return project
         raise HTTPException(status_code=404, detail="Projet introuvable")
 
     except Error as e:
