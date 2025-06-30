@@ -190,7 +190,7 @@ def get_project(project_id: int):
 
     try:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM project WHERE project_id = %s", (project_id))
+        cursor.execute("SELECT * FROM project WHERE project_id = %s", (project_id,))
         project = cursor.fetchone()
 
         if project:
@@ -216,7 +216,7 @@ class Education(BaseModel):
     link: str
     recommandation: str | None
     date: str
-    education: str
+    education: bool
 
 
 @app.get("/educations", response_model=List[Education])
@@ -268,7 +268,7 @@ def domain_skills():
         cursor = connection.cursor(dictionary=True)
         cursor.execute("SELECT id, name FROM domain_skills")
         results = cursor.fetchall()
-        return {"domain_skills": results}
+        return results
 
     except Error as e:
         return {"error": f"Query failed: {str(e)}"}
