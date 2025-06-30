@@ -1,8 +1,9 @@
-from typing import Optional
-from fastapi import FastAPI, HTTPException, Query
 import os
+from typing import List, Optional
+from fastapi import FastAPI, HTTPException, Query
 import mysql.connector
 from mysql.connector import Error
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -15,7 +16,7 @@ MYSQL_HOST = os.getenv("MYSQL_HOST", "mysql")
 MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 MYSQL_PORT = os.getenv("MYSQL_PORT", "3306")
 
-DATABASE_URL = f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
+# DB_URL = f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}" Ne sert à rien ?
 
 
 def db_connection():
@@ -46,7 +47,11 @@ def healthcheck():
     }
 
 
-@app.get("/education-name-logo")
+class EducationNameLogo(BaseModel):
+    name: str
+    logo: str
+
+@app.get("/education-name-logo", response_model=List[EducationNameLogo])
 def education_name_logo():
     connection, message = db_connection()
     if not connection:
@@ -56,8 +61,7 @@ def education_name_logo():
         cursor = connection.cursor(dictionary=True)
         cursor.execute("SELECT name, logo FROM education")
         results = cursor.fetchall()
-        print(type(results))
-        return {"education": results}
+        return results
 
     except Error as e:
         return {"error": f"Query failed: {str(e)}"}
@@ -69,7 +73,13 @@ def education_name_logo():
             connection.close()
 
 
-@app.get("/skills")
+class Skill(BaseModel):
+    domain: str
+    skill: str
+    icone: str
+    course: bool
+
+@app.get("/skills", response_model=Skill)
 def skills():
     connection, message = db_connection()
     if not connection:
@@ -79,14 +89,14 @@ def skills():
         cursor = connection.cursor(dictionary=True)
         cursor.execute(
             """
-                SELECT ds.name AS domaine, s.name AS competence, s.icone, s.course
+                SELECT ds.name AS domain, s.name AS skill, s.icone, s.course
                 FROM domain_skills_links dsl
                 JOIN skills s ON dsl.skill_id = s.skills_id
                 JOIN domain_skills ds ON dsl.domain_id = ds.id
             """
         )
         results = cursor.fetchall()
-        return {"education": results}
+        return results
     except Error as e:
         return {"error": f"Query failed: {str(e)}"}
 
@@ -97,7 +107,19 @@ def skills():
             connection.close()
 
 
-@app.get("/projects")
+class Project(BaseModel):
+    id: int
+    name: str
+    description: str
+    icone: str
+    link: str
+    domain: str
+    long_description: str
+    features: str
+    isWebsite: bool
+    demonstrate: bool
+
+@app.get("/projects", response_model=Project)
 def get_projects(
     domain: Optional[str] = Query(None), skill: Optional[int] = Query(None)
 ):
@@ -147,7 +169,7 @@ def get_projects(
 
         sorted_projects = logiciel + web + autre
 
-        return {"projects": sorted_projects}
+        return sorted_projects
 
     except Error as e:
         return {"error": f"Query failed: {str(e)}"}
@@ -159,7 +181,7 @@ def get_projects(
             connection.close()
 
 
-@app.get("/project/{project_id}")
+@app.get("/project/{project_id}", response_model=Project)
 def get_project(project_id: int):
     connection, message = db_connection()
     if not connection:
@@ -167,13 +189,12 @@ def get_project(project_id: int):
 
     try:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM project WHERE project_id = %s", (project_id,))
+        cursor.execute("SELECT * FROM project WHERE project_id = %s", (project_id))
         project = cursor.fetchone()
 
         if project:
             return {"project": project}
-        else:
-            raise HTTPException(status_code=404, detail="Projet introuvable")
+        raise HTTPException(status_code=404, detail="Projet introuvable")
 
     except Error as e:
         raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")
@@ -185,7 +206,18 @@ def get_project(project_id: int):
             connection.close()
 
 
-@app.get("/educations")
+class Education(BaseModel):
+    education_id: int
+    name: str
+    title: str
+    description: str
+    logo: str
+    link: str
+    recommandation: str
+    date: str
+    education: str
+
+@app.get("/educations", response_model=Education)
 def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
     """
     Retourne les parcours scolaire (education=1) ou professionnels (education=0).
@@ -207,7 +239,7 @@ def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
             cursor.execute("SELECT * FROM education ORDER BY education_id DESC")
 
         results = cursor.fetchall()
-        return {"educations": results}
+        return results
 
     except Error as e:
         raise HTTPException(status_code=500, detail=f"Query failed: {str(e)}")
@@ -219,7 +251,11 @@ def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
             connection.close()
 
 
-@app.get("/domain-skills")
+class DomainSkill(BaseModel):
+    id: int
+    name: str
+
+@app.get("/domain-skills", response_model=DomainSkill)
 def domain_skills():
     connection, message = db_connection()
     if not connection:
