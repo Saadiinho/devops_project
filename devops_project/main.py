@@ -81,7 +81,7 @@ class Skill(BaseModel):
     course: bool
 
 
-@app.get("/skills", response_model=Skill)
+@app.get("/skills", response_model=List[Skill])
 def skills():
     connection, message = db_connection()
     if not connection:
@@ -214,7 +214,7 @@ class Education(BaseModel):
     description: str
     logo: str
     link: str
-    recommandation: str
+    recommandation: str | None
     date: str
     education: str
 
