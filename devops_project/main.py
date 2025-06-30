@@ -110,7 +110,7 @@ def skills():
 
 
 class Project(BaseModel):
-    id: int
+    project_id: int
     name: str
     description: str
     icone: str
@@ -122,7 +122,7 @@ class Project(BaseModel):
     demonstrate: bool
 
 
-@app.get("/projects", response_model=Project)
+@app.get("/projects", response_model=List[Project])
 def get_projects(
     domain: Optional[str] = Query(None), skill: Optional[int] = Query(None)
 ):
@@ -156,8 +156,6 @@ def get_projects(
 
         cursor.execute(query, params)
         results = cursor.fetchall()
-
-        # Optionnel : trie comme en PHP
         logiciel = []
         web = []
         autre = []
@@ -221,7 +219,7 @@ class Education(BaseModel):
     education: str
 
 
-@app.get("/educations", response_model=Education)
+@app.get("/educations", response_model=List[Education])
 def get_educations(education: Optional[int] = Query(None, ge=0, le=1)):
     """
     Retourne les parcours scolaire (education=1) ou professionnels (education=0).
@@ -260,7 +258,7 @@ class DomainSkill(BaseModel):
     name: str
 
 
-@app.get("/domain-skills", response_model=DomainSkill)
+@app.get("/domain-skills", response_model=List[DomainSkill])
 def domain_skills():
     connection, message = db_connection()
     if not connection:
