@@ -4,8 +4,21 @@ from fastapi import FastAPI, HTTPException, Query
 import mysql.connector
 from mysql.connector import Error
 from pydantic import BaseModel
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from fastapi.middleware.cors import CORSMiddleware 
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"],  
+)
 
 __version__ = "1.0.0"
 
@@ -278,3 +291,47 @@ def domain_skills():
             cursor.close()
         if connection.is_connected():
             connection.close()
+
+
+SENDER_EMAIL = os.getenv("SMTP_USER")
+SENDER_PASSWORD = os.getenv("SMTP_PASSWORD")
+RECEIVER_EMAIL = os.getenv("RECEIVER_EMAIL", "toi@exemple.com")
+SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+
+class Mail(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    compagny: str | None
+    message: str
+
+@app.post("/send-mail")
+def send_mail(mail: Mail):
+    try:
+        # Création du message
+        msg = MIMEMultipart()
+        msg["From"] = mail.email
+        msg["To"] = RECEIVER_EMAIL
+        msg["Subject"] = f"Message de contact de {mail.first_name} {mail.last_name}"
+
+        body = f"""
+        Nom : {mail.first_name} {mail.last_name}
+        Email : {mail.email}
+        Entreprise : {mail.company or 'Aucune'}
+        
+        Message :
+        {mail.message}
+        """
+        msg.attach(MIMEText(body, "plain"))
+
+        # Connexion au serveur SMTP
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.sendmail(mail.email, RECEIVER_EMAIL, msg.as_string())
+
+        return {"message": "Email envoyé avec succès"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Échec de l'envoi de l'email : {str(e)}")
