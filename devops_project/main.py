@@ -7,17 +7,17 @@ from pydantic import BaseModel
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from fastapi.middleware.cors import CORSMiddleware 
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  
-    allow_headers=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 __version__ = "1.0.0"
@@ -299,12 +299,14 @@ RECEIVER_EMAIL = os.getenv("RECEIVER_EMAIL", "toi@exemple.com")
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 
+
 class Mail(BaseModel):
     first_name: str
     last_name: str
     email: str
     compagny: str | None
     message: str
+
 
 @app.post("/send-mail")
 def send_mail(mail: Mail):
@@ -334,4 +336,6 @@ def send_mail(mail: Mail):
         return {"message": "Email envoyé avec succès"}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Échec de l'envoi de l'email : {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Échec de l'envoi de l'email : {str(e)}"
+        )
