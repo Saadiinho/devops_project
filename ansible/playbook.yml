@@ -1,0 +1,5 @@
+- name: Start server
+  hosts: EC2instance
+  tasks:
+    - name: Install dependencies
+      command: apt update && apt upgrade

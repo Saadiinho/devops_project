@@ -1,5 +1,5 @@
 .venv/
-.env*
+.env
 terraform/aws/
 terraform/.terraform/
 terraform/.terraform.lock.hcl
