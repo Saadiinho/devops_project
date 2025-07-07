@@ -7,6 +7,7 @@ on:
 
 jobs:
   terraform:
+    if: false  # Never launch because no AWS account yet
     name: Create an EC2 instance
     runs-on: ubuntu-latest
     env: 
