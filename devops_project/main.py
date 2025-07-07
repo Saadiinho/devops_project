@@ -136,61 +136,35 @@ class Project(BaseModel):
 
 
 @app.get("/projects", response_model=List[Project])
-def get_projects(
-    domain: Optional[str] = Query(None), skill: Optional[int] = Query(None)
-):
+def projects():
     connection, message = db_connection()
     if not connection:
         return {"error": message}
-
     try:
         cursor = connection.cursor(dictionary=True)
-
-        query = "SELECT * FROM project"
-        conditions = []
-        params = {}
-
-        if domain:
-            conditions.append("domain = %(domain)s")
-            params["domain"] = domain
-
-        if skill:
-            conditions.append(
-                """
-                project_id IN (
-                    SELECT project_id FROM project_skills WHERE skill_id = %(skill)s
-                )
-            """
-            )
-            params["skill"] = skill
-
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
-
-        cursor.execute(query, params)
+        query = "SELECT * FROM project ORDER BY domain"
+        cursor.execute(query)
         results = cursor.fetchall()
-        logiciel = []
-        web = []
-        autre = []
+        return results
+    finally:
+        cursor.close()
+        connection.close()
 
-        for proj in results:
-            if proj["domain"] == "Développement logiciel":
-                logiciel.append(proj)
-            elif proj["domain"] == "Développement web":
-                web.append(proj)
-            else:
-                autre.append(proj)
 
-        sorted_projects = logiciel + web + autre
-
-        return sorted_projects
-
+@app.get("/projects/{domain}", response_model=List[Project])
+def projects_by_domain(domain: str):
+    connection, message = db_connection()
+    if not connection:
+        return {"error": message}
+    try:
+        cursor = connection.cursor(dictionary=True)
+        query = "SELECT * FROM project WHERE domain = %s"
+        cursor.execute(query, (domain,))
+        results = cursor.fetchall()
+        return results
     except Error as e:
         return {"error": f"Query failed: {str(e)}"}
-
     finally:
-        if "cursor" in locals():
-            cursor.close()
         if connection.is_connected():
             connection.close()
 
